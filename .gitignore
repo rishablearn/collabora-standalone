@@ -1,0 +1,45 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# SSL certificates
+ssl/*.pem
+ssl/*.key
+ssl/*.crt
+!ssl/.gitkeep
+
+# Logs
+*.log
+nginx/logs/*
+!nginx/logs/.gitkeep
+
+# Backups
+backups/
+
+# Node modules
+node_modules/
+wopi-server/node_modules/
+web-frontend/node_modules/
+
+# Build outputs
+web-frontend/dist/
+web-frontend/build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# Temporary files
+*.tmp
+*.temp

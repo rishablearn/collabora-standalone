@@ -1,0 +1,9 @@
+# SSL Certificate Directory
+# This directory should contain:
+#   - fullchain.pem  (SSL certificate + intermediate certificates)
+#   - privkey.pem    (SSL private key)
+#
+# For development: Run ./scripts/setup.sh to generate self-signed certificates
+# For production: Use Let's Encrypt via ./scripts/ssl-letsencrypt.sh
+#
+# IMPORTANT: Never commit actual certificates to version control!

@@ -1,0 +1,2 @@
+# Nginx logs directory
+# access.log and error.log will be created here when nginx runs
