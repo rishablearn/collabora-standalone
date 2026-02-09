@@ -11,6 +11,7 @@ A complete standalone deployment of **Collabora Online** with built-in authentic
 - **WOPI Protocol** - Complete WOPI server implementation
 - **Docker Deployment** - Containerized for easy deployment
 - **SSL/TLS Ready** - Nginx reverse proxy with HTTPS
+- **Customizable Branding** - Custom logo, colors, and home page ([see guide](CUSTOMIZATION.md))
 
 ## 📋 Prerequisites
 
@@ -200,6 +201,43 @@ The setup script generates self-signed certificates automatically.
 ```bash
 ./scripts/deploy.sh
 ```
+
+## 🎨 Customization
+
+Customize the branding, logo, and appearance of your deployment. For complete details, see [CUSTOMIZATION.md](CUSTOMIZATION.md).
+
+### Change Application Name
+
+```bash
+# In .env file
+VITE_APP_NAME=My Company Docs
+VITE_APP_TAGLINE=Collaborate with confidence
+```
+
+### Change Logo
+
+1. Place your logo in `web-frontend/public/custom/` directory
+2. Set the environment variable:
+
+```bash
+# In .env file
+VITE_LOGO_URL=/custom/my-logo.png
+```
+
+**Supported formats:** PNG, SVG (recommended), JPG
+
+### Other Branding Options
+
+| Variable | Description |
+|----------|-------------|
+| `VITE_APP_NAME` | Application name displayed in header and login |
+| `VITE_APP_TAGLINE` | Tagline shown on login page |
+| `VITE_LOGO_URL` | Path to custom logo (e.g., `/custom/logo.svg`) |
+| `VITE_SHOW_WELCOME_BANNER` | Show welcome banner on dashboard |
+| `VITE_WELCOME_TITLE` | Welcome banner title |
+| `VITE_WELCOME_MESSAGE` | Welcome banner message |
+| `VITE_ALLOW_REGISTRATION` | Enable/disable public registration |
+| `VITE_FOOTER_TEXT` | Custom footer text |
 
 ## 🔧 Configuration
 

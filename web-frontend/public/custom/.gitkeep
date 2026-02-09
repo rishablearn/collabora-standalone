@@ -1,0 +1,3 @@
+# Place custom branding assets here
+# Example: logo.png, logo.svg
+# Then update VITE_LOGO_URL=/custom/logo.png in your .env file

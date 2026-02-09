@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FileText, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
+import Logo from '../components/Logo';
+import branding from '../config/branding';
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -56,13 +58,13 @@ export default function Register() {
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          <FileText className="h-16 w-16 text-primary-600" />
+          <Logo size="large" />
         </div>
         <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
-          Create your account
+          {branding.registerTitle}
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          Start collaborating on documents
+          Start using {branding.appName}
         </p>
       </div>
 

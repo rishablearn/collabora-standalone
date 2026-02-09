@@ -1,7 +1,6 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
-  FileText, 
   LogOut, 
   Settings, 
   User,
@@ -9,6 +8,8 @@ import {
   X
 } from 'lucide-react';
 import { useState } from 'react';
+import { LogoWithName } from './Logo';
+import branding from '../config/branding';
 
 export default function Layout() {
   const { user, logout } = useAuth();
@@ -28,8 +29,7 @@ export default function Layout() {
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2">
-              <FileText className="h-8 w-8 text-primary-600" />
-              <span className="text-xl font-bold text-gray-900">Collabora Docs</span>
+              <LogoWithName />
             </Link>
 
             {/* Desktop Navigation */}

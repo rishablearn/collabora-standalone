@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FileText, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
+import Logo from '../components/Logo';
+import branding from '../config/branding';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -31,14 +33,19 @@ export default function Login() {
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          <FileText className="h-16 w-16 text-primary-600" />
+          <Logo size="large" />
         </div>
         <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
-          Collabora Docs
+          {branding.appName}
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          Sign in to your account
+          {branding.loginTitle}
         </p>
+        {branding.tagline && (
+          <p className="mt-1 text-center text-xs text-gray-500">
+            {branding.tagline}
+          </p>
+        )}
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
@@ -111,19 +118,21 @@ export default function Login() {
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-2 bg-white text-gray-500">
-                  New to Collabora Docs?
+                  New to {branding.appName}?
                 </span>
               </div>
             </div>
 
-            <div className="mt-6">
-              <Link
-                to="/register"
-                className="w-full flex justify-center py-2 px-4 border border-primary-600 rounded-md shadow-sm text-sm font-medium text-primary-600 bg-white hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-              >
-                Create an account
-              </Link>
-            </div>
+            {branding.allowRegistration && (
+              <div className="mt-6">
+                <Link
+                  to="/register"
+                  className="w-full flex justify-center py-2 px-4 border border-primary-600 rounded-md shadow-sm text-sm font-medium text-primary-600 bg-white hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                >
+                  Create an account
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>

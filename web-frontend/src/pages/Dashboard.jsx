@@ -19,8 +19,10 @@ import {
   Home,
   Search,
   Grid,
-  List
+  List,
+  X
 } from 'lucide-react';
+import branding, { formatText } from '../config/branding';
 
 const fileIcons = {
   'application/vnd.oasis.opendocument.text': FileText,
@@ -54,6 +56,14 @@ export default function Dashboard() {
   const [showNewFolderModal, setShowNewFolderModal] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
   const [breadcrumbs, setBreadcrumbs] = useState([{ id: null, name: 'My Documents' }]);
+  const [showWelcomeBanner, setShowWelcomeBanner] = useState(
+    branding.showWelcomeBanner && !localStorage.getItem('welcomeBannerDismissed')
+  );
+
+  const dismissWelcomeBanner = () => {
+    setShowWelcomeBanner(false);
+    localStorage.setItem('welcomeBannerDismissed', 'true');
+  };
 
   const fetchFiles = useCallback(async () => {
     setLoading(true);
@@ -324,12 +334,37 @@ export default function Dashboard() {
         </div>
       ) : (
         <>
+          {/* Welcome Banner */}
+          {showWelcomeBanner && !folderId && (
+            <div className="mb-6 bg-gradient-to-r from-primary-500 to-primary-600 rounded-xl p-6 text-white relative">
+              <button
+                onClick={dismissWelcomeBanner}
+                className="absolute top-4 right-4 text-white/80 hover:text-white"
+              >
+                <X className="h-5 w-5" />
+              </button>
+              <h2 className="text-2xl font-bold mb-2">
+                {formatText(branding.welcomeTitle)}
+              </h2>
+              <p className="text-primary-100 mb-4">
+                {branding.welcomeMessage}
+              </p>
+              <div className="flex flex-wrap gap-4">
+                {branding.features.map((feature, index) => (
+                  <div key={index} className="flex items-center space-x-2 bg-white/10 rounded-lg px-3 py-2">
+                    <span className="text-sm font-medium">{feature.title}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Empty state */}
           {files.length === 0 && folders.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-xl border-2 border-dashed border-gray-300">
               <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No documents yet</h3>
-              <p className="text-gray-500 mb-6">Get started by creating a new document or uploading a file</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">{branding.emptyStateTitle}</h3>
+              <p className="text-gray-500 mb-6">{branding.emptyStateMessage}</p>
               <button
                 onClick={() => setShowNewMenu(true)}
                 className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
