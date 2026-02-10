@@ -57,6 +57,61 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.0] - 2026-02-10
+
+### Added
+
+#### Customization Features
+- **Branding configuration** - Centralized branding via `src/config/branding.js`
+- **Custom logo support** - Place logos in `public/custom/` directory
+- **Environment variable overrides** - Configure branding via `VITE_*` variables
+- **Welcome banner** - Customizable dashboard welcome message
+- **CUSTOMIZATION.md** - Comprehensive customization guide
+
+#### Security Improvements
+- **SECURITY.md** - Complete security documentation
+- **upgrade-security.sh** - Script to upgrade existing deployments
+- **Required secrets validation** - Application fails fast if secrets not configured
+- **No default passwords** - Removed all cleartext default passwords
+
+### Changed
+- `.env.example` now uses placeholder values instead of default passwords
+- `docker-compose.yml` requires `COLLABORA_ADMIN_PASSWORD` (no fallback)
+- `crypto.js` requires `WOPI_SECRET` environment variable (no fallback)
+
+### Security
+- **BREAKING**: Deployments using default passwords must run `./scripts/upgrade-security.sh`
+- Removed `admin123` default Collabora admin password
+- Removed `collabora_dev_password` default database password
+- Removed `dev-jwt-secret-change-in-production` default JWT secret
+- Removed `dev-wopi-secret-change-in-production` default WOPI secret
+- Removed `'default-secret'` fallback in WOPI token generation
+
+### Migration Guide for Existing Deployments
+
+If you deployed before this version, you likely have insecure default passwords.
+
+**Quick upgrade:**
+```bash
+git pull origin main
+./scripts/upgrade-security.sh
+```
+
+**What this does:**
+1. Backs up your current `.env` file
+2. Generates new secure secrets
+3. Updates your configuration
+4. Restarts services
+
+**Impact:**
+- All users will be logged out (JWT secret changes)
+- Active document sessions will end (WOPI secret changes)
+- You'll receive a new Collabora admin password
+
+See `SECURITY.md` for detailed manual upgrade steps.
+
+---
+
 ## [Unreleased]
 
 ### Planned

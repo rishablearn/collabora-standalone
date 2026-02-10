@@ -225,6 +225,128 @@ To rotate secrets in production:
 3. **Log out on shared computers** - Sessions persist until timeout
 4. **Report suspicious activity** - Contact administrator
 
+## Upgrading Existing Deployments
+
+If you have an existing deployment with older (potentially insecure) passwords, follow these steps to upgrade:
+
+### Quick Upgrade (Recommended)
+
+Run the security upgrade script:
+```bash
+./scripts/upgrade-security.sh
+```
+
+This script will:
+1. Back up your current `.env` file
+2. Generate new secure secrets
+3. Update your configuration
+4. Restart services
+
+### Manual Upgrade Steps
+
+#### Step 1: Back Up Current Configuration
+
+```bash
+# Create backup
+cp .env .env.backup.$(date +%Y%m%d_%H%M%S)
+```
+
+#### Step 2: Check for Insecure Passwords
+
+```bash
+# Check if you have any default/weak passwords
+grep -E "admin123|collabora_dev_password|dev-.*-secret|CHANGE_ME" .env
+
+# If any matches found, you need to update those values
+```
+
+#### Step 3: Generate New Secure Secrets
+
+```bash
+# Generate new secrets
+NEW_JWT_SECRET=$(openssl rand -hex 32)
+NEW_WOPI_SECRET=$(openssl rand -hex 32)
+NEW_POSTGRES_PASSWORD=$(openssl rand -hex 16)
+NEW_COLLABORA_ADMIN_PASSWORD=$(openssl rand -base64 12)
+
+# Display them (save these!)
+echo "New JWT_SECRET: $NEW_JWT_SECRET"
+echo "New WOPI_SECRET: $NEW_WOPI_SECRET"
+echo "New POSTGRES_PASSWORD: $NEW_POSTGRES_PASSWORD"
+echo "New COLLABORA_ADMIN_PASSWORD: $NEW_COLLABORA_ADMIN_PASSWORD"
+```
+
+#### Step 4: Update Environment File
+
+```bash
+# Update each secret in .env
+sed -i "s/JWT_SECRET=.*/JWT_SECRET=${NEW_JWT_SECRET}/" .env
+sed -i "s/WOPI_SECRET=.*/WOPI_SECRET=${NEW_WOPI_SECRET}/" .env
+sed -i "s/COLLABORA_ADMIN_PASSWORD=.*/COLLABORA_ADMIN_PASSWORD=${NEW_COLLABORA_ADMIN_PASSWORD}/" .env
+```
+
+#### Step 5: Update Database Password (if changing)
+
+**Important**: Changing the database password requires updating PostgreSQL first.
+
+```bash
+# 1. Connect to PostgreSQL and change password
+docker compose exec postgres psql -U collabora -d collabora_db -c \
+  "ALTER USER collabora WITH PASSWORD '${NEW_POSTGRES_PASSWORD}';"
+
+# 2. Update .env file
+sed -i "s/POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=${NEW_POSTGRES_PASSWORD}/" .env
+```
+
+#### Step 6: Restart Services
+
+```bash
+# Stop all services
+docker compose down
+
+# Start with new configuration
+docker compose up -d
+```
+
+#### Step 7: Verify Services Are Running
+
+```bash
+# Check all containers are healthy
+docker compose ps
+
+# Test the application
+curl -k https://localhost/health
+```
+
+### What Changes After Upgrade
+
+| Change | Impact |
+|--------|--------|
+| JWT_SECRET changed | All users will be logged out |
+| WOPI_SECRET changed | Active document editing sessions will end |
+| POSTGRES_PASSWORD changed | No user impact (internal) |
+| COLLABORA_ADMIN_PASSWORD changed | New password for admin console |
+
+### Rollback Procedure
+
+If something goes wrong:
+
+```bash
+# Stop services
+docker compose down
+
+# Restore backup
+cp .env.backup.YYYYMMDD_HHMMSS .env
+
+# If you changed database password, restore it
+docker compose up -d postgres
+docker compose exec postgres psql -U collabora -d collabora_db -c \
+  "ALTER USER collabora WITH PASSWORD 'old-password-from-backup';"
+
+# Restart all services
+docker compose up -d
+```
+
 ## Reporting Security Issues
 
 If you discover a security vulnerability:
