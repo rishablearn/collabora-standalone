@@ -12,6 +12,7 @@ A complete standalone deployment of **Collabora Online** with built-in authentic
 - **Docker Deployment** - Containerized for easy deployment
 - **SSL/TLS Ready** - Nginx reverse proxy with HTTPS
 - **Customizable Branding** - Custom logo, colors, and home page ([see guide](CUSTOMIZATION.md))
+- **Secure by Default** - Encrypted passwords, JWT auth, no cleartext secrets ([security guide](SECURITY.md))
 
 ## 📋 Prerequisites
 

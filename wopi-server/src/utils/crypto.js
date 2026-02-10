@@ -19,7 +19,10 @@ function generateAccessToken(fileId, userId, permissions = 'view') {
     nonce: crypto.randomBytes(16).toString('hex')
   };
   
-  const secret = process.env.WOPI_SECRET || 'default-secret';
+  const secret = process.env.WOPI_SECRET;
+  if (!secret) {
+    throw new Error('WOPI_SECRET environment variable is required');
+  }
   const encrypted = CryptoJS.AES.encrypt(JSON.stringify(payload), secret).toString();
   return Buffer.from(encrypted).toString('base64url');
 }
@@ -29,7 +32,10 @@ function generateAccessToken(fileId, userId, permissions = 'view') {
  */
 function verifyAccessToken(token) {
   try {
-    const secret = process.env.WOPI_SECRET || 'default-secret';
+    const secret = process.env.WOPI_SECRET;
+  if (!secret) {
+    throw new Error('WOPI_SECRET environment variable is required');
+  }
     const encrypted = Buffer.from(token, 'base64url').toString();
     const decrypted = CryptoJS.AES.decrypt(encrypted, secret);
     const payload = JSON.parse(decrypted.toString(CryptoJS.enc.Utf8));

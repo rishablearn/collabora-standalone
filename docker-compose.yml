@@ -10,8 +10,8 @@ services:
       - MKNOD
     environment:
       - aliasgroup1=https://${DOMAIN:-localhost}:443
-      - username=${COLLABORA_ADMIN_USER:-admin}
-      - password=${COLLABORA_ADMIN_PASSWORD:-admin123}
+      - username=${COLLABORA_ADMIN_USER:?COLLABORA_ADMIN_USER is required}
+      - password=${COLLABORA_ADMIN_PASSWORD:?COLLABORA_ADMIN_PASSWORD is required - run ./scripts/setup.sh}
       - server_name=${DOMAIN:-localhost}
       - dictionaries=en_US,en_GB
       - extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:net.frame_ancestors=${DOMAIN:-localhost} --o:logging.level=warning --o:storage.wopi.host[0]=nginx --o:storage.ssl.enable=false --o:net.proto=IPv4
