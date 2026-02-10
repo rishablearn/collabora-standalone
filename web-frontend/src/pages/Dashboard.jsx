@@ -275,26 +275,52 @@ export default function Dashboard() {
             {showNewMenu && (
               <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
                 <div className="py-2">
+                  <div className="px-3 py-1 text-xs font-semibold text-gray-500 uppercase">Documents</div>
                   <button
-                    onClick={() => handleCreateDocument('document')}
+                    onClick={() => handleCreateDocument('docx')}
                     className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
                   >
                     <FileText className="h-5 w-5 text-blue-500" />
-                    <span>Document</span>
+                    <span>Word Document (.docx)</span>
                   </button>
                   <button
-                    onClick={() => handleCreateDocument('spreadsheet')}
+                    onClick={() => handleCreateDocument('odt')}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                  >
+                    <FileText className="h-5 w-5 text-blue-400" />
+                    <span>OpenDocument Text (.odt)</span>
+                  </button>
+                  <hr className="my-2" />
+                  <div className="px-3 py-1 text-xs font-semibold text-gray-500 uppercase">Spreadsheets</div>
+                  <button
+                    onClick={() => handleCreateDocument('xlsx')}
                     className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
                   >
                     <FileSpreadsheet className="h-5 w-5 text-green-500" />
-                    <span>Spreadsheet</span>
+                    <span>Excel Spreadsheet (.xlsx)</span>
                   </button>
                   <button
-                    onClick={() => handleCreateDocument('presentation')}
+                    onClick={() => handleCreateDocument('ods')}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                  >
+                    <FileSpreadsheet className="h-5 w-5 text-green-400" />
+                    <span>OpenDocument Spreadsheet (.ods)</span>
+                  </button>
+                  <hr className="my-2" />
+                  <div className="px-3 py-1 text-xs font-semibold text-gray-500 uppercase">Presentations</div>
+                  <button
+                    onClick={() => handleCreateDocument('pptx')}
                     className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
                   >
                     <Presentation className="h-5 w-5 text-orange-500" />
-                    <span>Presentation</span>
+                    <span>PowerPoint Presentation (.pptx)</span>
+                  </button>
+                  <button
+                    onClick={() => handleCreateDocument('odp')}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                  >
+                    <Presentation className="h-5 w-5 text-orange-400" />
+                    <span>OpenDocument Presentation (.odp)</span>
                   </button>
                   <hr className="my-2" />
                   <button

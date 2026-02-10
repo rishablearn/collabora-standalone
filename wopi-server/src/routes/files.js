@@ -34,13 +34,13 @@ function createMinimalODF(type, mimeType) {
   
   // Add content based on type
   let content;
-  if (type === 'document') {
+  if (type === 'document' || type === 'odt') {
     content = `<?xml version="1.0" encoding="UTF-8"?>
 <office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" 
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" office:version="1.2">
   <office:body><office:text><text:p/></office:text></office:body>
 </office:document-content>`;
-  } else if (type === 'spreadsheet') {
+  } else if (type === 'spreadsheet' || type === 'ods') {
     content = `<?xml version="1.0" encoding="UTF-8"?>
 <office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" 
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" office:version="1.2">
@@ -48,7 +48,7 @@ function createMinimalODF(type, mimeType) {
     <table:table table:name="Sheet1"><table:table-row><table:table-cell/></table:table-row></table:table>
   </office:spreadsheet></office:body>
 </office:document-content>`;
-  } else if (type === 'presentation') {
+  } else if (type === 'presentation' || type === 'odp') {
     content = `<?xml version="1.0" encoding="UTF-8"?>
 <office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" 
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" office:version="1.2">
@@ -58,6 +58,149 @@ function createMinimalODF(type, mimeType) {
 </office:document-content>`;
   }
   zip.addFile('content.xml', Buffer.from(content));
+  
+  return zip.toBuffer();
+}
+
+/**
+ * Create a minimal valid OOXML file buffer (docx, xlsx, pptx)
+ * OOXML files are ZIP archives with specific XML structure
+ */
+function createMinimalOOXML(type) {
+  const AdmZip = require('adm-zip');
+  const zip = new AdmZip();
+  
+  if (type === 'docx') {
+    // [Content_Types].xml
+    zip.addFile('[Content_Types].xml', Buffer.from(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+</Types>`));
+    
+    // _rels/.rels
+    zip.addFile('_rels/.rels', Buffer.from(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`));
+    
+    // word/document.xml
+    zip.addFile('word/document.xml', Buffer.from(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    <w:p><w:r><w:t></w:t></w:r></w:p>
+  </w:body>
+</w:document>`));
+    
+  } else if (type === 'xlsx') {
+    // [Content_Types].xml
+    zip.addFile('[Content_Types].xml', Buffer.from(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+</Types>`));
+    
+    // _rels/.rels
+    zip.addFile('_rels/.rels', Buffer.from(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`));
+    
+    // xl/workbook.xml
+    zip.addFile('xl/workbook.xml', Buffer.from(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets>
+    <sheet name="Sheet1" sheetId="1" r:id="rId1"/>
+  </sheets>
+</workbook>`));
+    
+    // xl/_rels/workbook.xml.rels
+    zip.addFile('xl/_rels/workbook.xml.rels', Buffer.from(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+</Relationships>`));
+    
+    // xl/worksheets/sheet1.xml
+    zip.addFile('xl/worksheets/sheet1.xml', Buffer.from(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <sheetData>
+    <row r="1"><c r="A1"><v></v></c></row>
+  </sheetData>
+</worksheet>`));
+    
+  } else if (type === 'pptx') {
+    // [Content_Types].xml
+    zip.addFile('[Content_Types].xml', Buffer.from(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/>
+  <Override PartName="/ppt/slides/slide1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>
+  <Override PartName="/ppt/slideLayouts/slideLayout1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml"/>
+  <Override PartName="/ppt/slideMasters/slideMaster1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml"/>
+</Types>`));
+    
+    // _rels/.rels
+    zip.addFile('_rels/.rels', Buffer.from(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="ppt/presentation.xml"/>
+</Relationships>`));
+    
+    // ppt/presentation.xml
+    zip.addFile('ppt/presentation.xml', Buffer.from(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:presentation xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rId1"/></p:sldMasterIdLst>
+  <p:sldIdLst><p:sldId id="256" r:id="rId2"/></p:sldIdLst>
+  <p:sldSz cx="9144000" cy="6858000" type="screen4x3"/>
+</p:presentation>`));
+    
+    // ppt/_rels/presentation.xml.rels
+    zip.addFile('ppt/_rels/presentation.xml.rels', Buffer.from(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster" Target="slideMasters/slideMaster1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide1.xml"/>
+</Relationships>`));
+    
+    // ppt/slideMasters/slideMaster1.xml
+    zip.addFile('ppt/slideMasters/slideMaster1.xml', Buffer.from(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:sldMaster xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <p:cSld><p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr/></p:spTree></p:cSld>
+  <p:sldLayoutIdLst><p:sldLayoutId id="2147483649" r:id="rId1"/></p:sldLayoutIdLst>
+</p:sldMaster>`));
+    
+    // ppt/slideMasters/_rels/slideMaster1.xml.rels
+    zip.addFile('ppt/slideMasters/_rels/slideMaster1.xml.rels', Buffer.from(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>
+</Relationships>`));
+    
+    // ppt/slideLayouts/slideLayout1.xml
+    zip.addFile('ppt/slideLayouts/slideLayout1.xml', Buffer.from(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:sldLayout xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" type="blank">
+  <p:cSld><p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr/></p:spTree></p:cSld>
+</p:sldLayout>`));
+    
+    // ppt/slideLayouts/_rels/slideLayout1.xml.rels
+    zip.addFile('ppt/slideLayouts/_rels/slideLayout1.xml.rels', Buffer.from(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster" Target="../slideMasters/slideMaster1.xml"/>
+</Relationships>`));
+    
+    // ppt/slides/slide1.xml
+    zip.addFile('ppt/slides/slide1.xml', Buffer.from(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:sld xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <p:cSld><p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr/></p:spTree></p:cSld>
+</p:sld>`));
+    
+    // ppt/slides/_rels/slide1.xml.rels
+    zip.addFile('ppt/slides/_rels/slide1.xml.rels', Buffer.from(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>
+</Relationships>`));
+  }
   
   return zip.toBuffer();
 }
@@ -614,15 +757,33 @@ router.post('/create', async (req, res) => {
     }
 
     // Determine file extension and template
+    // Supports both generic types (document, spreadsheet, presentation) 
+    // and specific formats (odt, docx, doc, ods, xlsx, xls, odp, pptx, ppt)
     const templates = {
-      document: { ext: 'odt', mime: 'application/vnd.oasis.opendocument.text' },
-      spreadsheet: { ext: 'ods', mime: 'application/vnd.oasis.opendocument.spreadsheet' },
-      presentation: { ext: 'odp', mime: 'application/vnd.oasis.opendocument.presentation' }
+      // Generic types (default to ODF)
+      document: { ext: 'odt', mime: 'application/vnd.oasis.opendocument.text', format: 'odf' },
+      spreadsheet: { ext: 'ods', mime: 'application/vnd.oasis.opendocument.spreadsheet', format: 'odf' },
+      presentation: { ext: 'odp', mime: 'application/vnd.oasis.opendocument.presentation', format: 'odf' },
+      // ODF formats
+      odt: { ext: 'odt', mime: 'application/vnd.oasis.opendocument.text', format: 'odf' },
+      ods: { ext: 'ods', mime: 'application/vnd.oasis.opendocument.spreadsheet', format: 'odf' },
+      odp: { ext: 'odp', mime: 'application/vnd.oasis.opendocument.presentation', format: 'odf' },
+      // OOXML formats (Microsoft Office 2007+)
+      docx: { ext: 'docx', mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', format: 'ooxml' },
+      xlsx: { ext: 'xlsx', mime: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', format: 'ooxml' },
+      pptx: { ext: 'pptx', mime: 'application/vnd.openxmlformats-officedocument.presentationml.presentation', format: 'ooxml' },
+      // Legacy Microsoft formats (97-2003) - create as OOXML, Collabora will handle
+      doc: { ext: 'docx', mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', format: 'ooxml', legacy: true },
+      xls: { ext: 'xlsx', mime: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', format: 'ooxml', legacy: true },
+      ppt: { ext: 'pptx', mime: 'application/vnd.openxmlformats-officedocument.presentationml.presentation', format: 'ooxml', legacy: true }
     };
 
     const template = templates[type];
     if (!template) {
-      return res.status(400).json({ error: 'Invalid document type' });
+      return res.status(400).json({ 
+        error: 'Invalid document type',
+        validTypes: Object.keys(templates)
+      });
     }
 
     const filename = name.endsWith(`.${template.ext}`) ? name : `${name}.${template.ext}`;
@@ -635,14 +796,19 @@ router.post('/create', async (req, res) => {
     // Create user directory
     await fs.mkdir(userDir, { recursive: true });
 
-    // Copy template or create minimal ODF file
+    // Copy template or create minimal file
     const templatePath = path.join(__dirname, '..', '..', 'templates', `empty.${template.ext}`);
     try {
       await fs.copyFile(templatePath, filePath);
     } catch {
-      // Create minimal valid ODF file if template doesn't exist
-      const minimalODF = createMinimalODF(type, template.mime);
-      await fs.writeFile(filePath, minimalODF);
+      // Create minimal valid file if template doesn't exist
+      let fileBuffer;
+      if (template.format === 'ooxml') {
+        fileBuffer = createMinimalOOXML(template.ext);
+      } else {
+        fileBuffer = createMinimalODF(type, template.mime);
+      }
+      await fs.writeFile(filePath, fileBuffer);
     }
 
     const stats = await fs.stat(filePath);

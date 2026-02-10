@@ -57,6 +57,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.0] - 2026-02-10
+
+### Added
+
+#### Multiple File Format Support
+- **Create documents in any format** - Support for DOCX, XLSX, PPTX (Microsoft Office) and ODT, ODS, ODP (OpenDocument)
+- **Format selection menu** - New dropdown menu in dashboard to choose specific file format when creating documents
+- **OOXML file generation** - Backend now generates valid OOXML files (docx, xlsx, pptx) programmatically
+- **Legacy format handling** - Request DOC/XLS/PPT creates modern OOXML equivalent for compatibility
+
+### Changed
+- Dashboard "New" menu now shows all available file formats organized by category
+- API `/api/files/create` now accepts specific format types (docx, xlsx, pptx, odt, ods, odp)
+
+---
+
 ## [1.1.0] - 2026-02-10
 
 ### Added

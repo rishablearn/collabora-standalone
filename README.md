@@ -5,6 +5,7 @@ A complete standalone deployment of **Collabora Online** with built-in authentic
 ## 🚀 Features
 
 - **Standalone Collabora Online** - Full office suite (Writer, Calc, Impress)
+- **Multiple File Formats** - Create and edit DOCX, XLSX, PPTX, ODT, ODS, ODP files
 - **Built-in Authentication** - JWT-based auth with user management
 - **File Storage** - Local file storage with quota management
 - **Modern Web UI** - React-based document manager
